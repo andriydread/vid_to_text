@@ -1,4 +1,8 @@
 *.mp4
+
 *.txt
+!some_links.txt
+
 .langchain.db
+
 .ipynb_checkpoints

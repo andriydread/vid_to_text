@@ -1,0 +1,5 @@
+Whisper github
+	https://github.com/openai/whisper
+
+OpenAI Text-To-Speach
+	https://platform.openai.com/docs/guides/text-to-speech
