@@ -55,3 +55,7 @@ text = model.transcribe(video.title + '/' + video.title + '.mp4')
 with open(video.title + '/' + video.title + '.txt' , 'w') as f:
     f.write(text["text"])
     f.close()
+
+
+
+    

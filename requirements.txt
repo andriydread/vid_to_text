@@ -1,0 +1,8 @@
+mock
+os
+pytube
+re
+openai-whisper 
+langchain 
+langchain_openai
+openai

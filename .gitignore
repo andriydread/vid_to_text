@@ -2,6 +2,7 @@
 
 *.txt
 !some_links.txt
+!requirements.txt
 
 .langchain.db
 
