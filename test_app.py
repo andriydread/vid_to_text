@@ -9,6 +9,7 @@ from langchain_openai import ChatOpenAI
 from langchain.cache import SQLiteCache
 from langchain.globals import set_llm_cache
 from langchain_core.output_parsers import StrOutputParser
+from openai import OpenAI
 
 
 def patched_throttling_plan(js: str):
@@ -39,18 +40,27 @@ def patched_throttling_plan(js: str):
 with mock.patch('pytube.cipher.get_throttling_plan', patched_throttling_plan):
     from pytube import YouTube
 
-    url = 'https://www.youtube.com/watch?v=VIR46oH-ufk&ab_channel=Horses'
+    url = input('Input youtube URL here, type "test" to run test URL\n')
+
+    if url.lower() == 'test':
+        url = 'https://www.youtube.com/watch?v=VIR46oH-ufk&ab_channel=Horses'
 
     video = YouTube(url)
     audio = video.streams.filter(only_audio=True, file_extension='mp4')[0]
 
-    os.mkdir(video.title)
+    
+    dir = video.title
+    check_dir = os.path.isdir(dir)
+    if not check_dir:
+        os.mkdir(video.title)
+    else:
+        pass
 
     audio.download(filename=video.title + '/' + video.title + '.mp4')
 
 
 model = whisper.load_model("tiny.en")
-text = model.transcribe(video.title + '/' + video.title + '.mp4')
+text = model.transcribe(video.title + '/' + video.title + '.mp4', fp16=False)
 
 with open(video.title + '/' + video.title + '.txt' , 'w') as f:
     f.write(text["text"])
@@ -58,4 +68,36 @@ with open(video.title + '/' + video.title + '.txt' , 'w') as f:
 
 
 
+content = open(video.title + '/' + video.title + '.txt', 'r').read()
+
+set_llm_cache(SQLiteCache(database_path=".langchain.db"))
+output_parser = StrOutputParser()
+
+
+model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.5)
+
+prompt = PromptTemplate(
+    template="""Create 2 separate paragraphs based on this text, start the first paragraph with the words /
+    'The idea of this text...' and try to summarize it into at least 10-15 sentences,/
+    in second paragraph give 4 simple statements in numbered list form based on of this text. Text ====== {text}""",
+    input_variables=["text"],
+)
+
+
+chain = prompt | model | output_parser
+
+with open(video.title + '/' + 'AI_' + video.title + '.txt', 'w') as f:
+    f.write(chain.invoke(content))
+    f.close()
+
+
+audio_req = input('Create audio file?: [y/n] ')
     
+if audio_req == 'y':
+    client = OpenAI()
+    response = client.audio.speech.create(
+        model = 'tts-1',
+        voice = 'echo',
+        input = open(video.title + '/' + 'AI_' + video.title + '.txt', 'r').read()
+    )
+    response.stream_to_file(video.title + '/' + 'AI_' + video.title + '.mp4')
