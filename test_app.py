@@ -37,7 +37,7 @@ def patched_throttling_plan(js: str):
     return transform_steps
 
 
-with mock.patch('pytube.cipher.get_throttling_plan', patched_throttling_plan):
+with mock.patch('pytubefix.cipher.get_throttling_plan', patched_throttling_plan):
     from pytube import YouTube
 
     url = input('Input youtube URL here, type "test" to run test URL\n')
