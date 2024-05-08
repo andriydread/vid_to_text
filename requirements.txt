@@ -1,6 +1,5 @@
 mock
 os
-pytube
 re
 openai-whisper 
 langchain 
