@@ -7,3 +7,5 @@
 .langchain.db
 
 .ipynb_checkpoints
+
+pytube/__pycache__
